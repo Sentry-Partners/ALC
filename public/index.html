@@ -1,0 +1,583 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Almost Living Context MCP Server</title>
+    <meta
+      name="description"
+      content="Setup instructions for the Almost Living Context MCP server and local context service."
+    />
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f7f8f5;
+        --ink: #17201c;
+        --muted: #5a665f;
+        --line: #d7ded4;
+        --panel: #ffffff;
+        --panel-alt: #eef4f7;
+        --accent: #126a5d;
+        --accent-strong: #0b4f45;
+        --blue: #265f8f;
+        --rust: #9a4d24;
+        --code: #111816;
+        --code-text: #edf7ef;
+        --shadow: 0 18px 45px rgba(22, 34, 29, 0.08);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0) 360px),
+          var(--bg);
+      }
+
+      a {
+        color: var(--accent-strong);
+        text-decoration-thickness: 1px;
+        text-underline-offset: 3px;
+      }
+
+      .page {
+        max-width: 1160px;
+        margin: 0 auto;
+        padding: 28px 24px 56px;
+      }
+
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        padding: 4px 0 28px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 700;
+      }
+
+      .mark {
+        display: grid;
+        place-items: center;
+        width: 36px;
+        height: 36px;
+        border: 1px solid var(--line);
+        background: var(--panel);
+        color: var(--accent);
+        font-size: 18px;
+        font-weight: 800;
+      }
+
+      nav {
+        display: flex;
+        gap: 18px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .intro {
+        display: grid;
+        grid-template-columns: minmax(0, 1.05fr) minmax(340px, 0.95fr);
+        gap: 32px;
+        align-items: start;
+        padding: 32px 0 24px;
+      }
+
+      h1 {
+        max-width: 780px;
+        margin: 0;
+        font-size: clamp(36px, 6vw, 72px);
+        line-height: 0.95;
+        letter-spacing: 0;
+      }
+
+      .lead {
+        max-width: 680px;
+        margin: 22px 0 0;
+        color: var(--muted);
+        font-size: 19px;
+        line-height: 1.55;
+      }
+
+      .quick {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 28px;
+      }
+
+      .quick a {
+        display: inline-flex;
+        align-items: center;
+        min-height: 42px;
+        border: 1px solid var(--line);
+        background: var(--panel);
+        padding: 9px 13px;
+        color: var(--ink);
+        font-size: 14px;
+        font-weight: 650;
+        text-decoration: none;
+        box-shadow: 0 6px 18px rgba(22, 34, 29, 0.05);
+      }
+
+      .system-map {
+        border: 1px solid var(--line);
+        background: var(--panel);
+        padding: 18px;
+        box-shadow: var(--shadow);
+      }
+
+      .map-row {
+        display: grid;
+        grid-template-columns: 1fr 50px 1fr;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .node {
+        min-height: 92px;
+        border: 1px solid var(--line);
+        padding: 14px;
+        background: #fbfcfa;
+      }
+
+      .node strong,
+      .step strong,
+      .tool strong {
+        display: block;
+        margin-bottom: 7px;
+        font-size: 15px;
+      }
+
+      .node span,
+      .step p,
+      .tool p {
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.45;
+      }
+
+      .arrow {
+        height: 2px;
+        background: var(--accent);
+        position: relative;
+      }
+
+      .arrow::after {
+        content: "";
+        position: absolute;
+        right: 0;
+        top: -5px;
+        width: 0;
+        height: 0;
+        border-left: 8px solid var(--accent);
+        border-top: 6px solid transparent;
+        border-bottom: 6px solid transparent;
+      }
+
+      .stack {
+        display: grid;
+        gap: 8px;
+        margin-top: 14px;
+      }
+
+      .frame {
+        border-left: 5px solid var(--blue);
+        background: var(--panel-alt);
+        padding: 10px 12px;
+        color: #28445a;
+        font-size: 13px;
+        font-weight: 650;
+      }
+
+      main {
+        display: grid;
+        gap: 34px;
+      }
+
+      section {
+        border-top: 1px solid var(--line);
+        padding-top: 28px;
+      }
+
+      .section-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 24px;
+        margin-bottom: 16px;
+      }
+
+      h2 {
+        margin: 0;
+        font-size: 26px;
+        letter-spacing: 0;
+      }
+
+      .section-head p {
+        max-width: 520px;
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+
+      .steps {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .step,
+      .tool {
+        border: 1px solid var(--line);
+        background: var(--panel);
+        padding: 16px;
+      }
+
+      .step-num {
+        display: inline-grid;
+        place-items: center;
+        width: 28px;
+        height: 28px;
+        margin-bottom: 14px;
+        background: var(--accent);
+        color: #fff;
+        font-weight: 800;
+        font-size: 13px;
+      }
+
+      .code-block {
+        position: relative;
+        margin: 12px 0 0;
+        background: var(--code);
+        color: var(--code-text);
+        overflow: hidden;
+      }
+
+      pre {
+        margin: 0;
+        padding: 18px;
+        overflow-x: auto;
+        font-size: 13px;
+        line-height: 1.55;
+      }
+
+      code {
+        font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      }
+
+      .copy {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.24);
+        background: rgba(255, 255, 255, 0.08);
+        color: #fff;
+        padding: 6px 9px;
+        font: inherit;
+        font-size: 12px;
+        cursor: pointer;
+      }
+
+      .copy:focus-visible,
+      .quick a:focus-visible,
+      nav a:focus-visible {
+        outline: 3px solid rgba(18, 106, 93, 0.35);
+        outline-offset: 3px;
+      }
+
+      .wide-code {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(280px, 0.42fr);
+        gap: 16px;
+      }
+
+      .note {
+        border: 1px solid var(--line);
+        background: #fff8ef;
+        color: #684424;
+        padding: 16px;
+        line-height: 1.5;
+      }
+
+      .tools {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .tool {
+        border-left: 4px solid var(--rust);
+      }
+
+      footer {
+        margin-top: 44px;
+        padding-top: 22px;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      @media (max-width: 860px) {
+        .page {
+          padding: 22px 16px 44px;
+        }
+
+        header,
+        .section-head {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+
+        nav {
+          flex-wrap: wrap;
+        }
+
+        .intro,
+        .wide-code,
+        .steps,
+        .tools {
+          grid-template-columns: 1fr;
+        }
+
+        .map-row {
+          grid-template-columns: 1fr;
+        }
+
+        .arrow {
+          width: 2px;
+          height: 34px;
+          justify-self: center;
+        }
+
+        .arrow::after {
+          right: -5px;
+          top: auto;
+          bottom: 0;
+          border-top: 8px solid var(--accent);
+          border-left: 6px solid transparent;
+          border-right: 6px solid transparent;
+          border-bottom: 0;
+        }
+
+        h1 {
+          font-size: 42px;
+          line-height: 1;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <header>
+        <div class="brand">
+          <div class="mark">ALC</div>
+          <span>Almost Living Context</span>
+        </div>
+        <nav aria-label="Page sections">
+          <a href="#quick-start">Quick start</a>
+          <a href="#client-config">Client config</a>
+          <a href="#tools">Tools</a>
+          <a href="https://github.com/Sentry-Partners/ALC">GitHub</a>
+        </nav>
+      </header>
+
+      <div class="intro">
+        <div>
+          <h1>MCP server setup for local living context.</h1>
+          <p class="lead">
+            Run the Almost Living Context service, attach the MCP stdio server, and give agents a small
+            toolset for pulling context, adding frames, compacting old work, and checking stale claims.
+          </p>
+          <div class="quick" aria-label="Primary links">
+            <a href="#quick-start">Run locally</a>
+            <a href="#client-config">Add to an MCP client</a>
+            <a href="#tools">Review tool list</a>
+          </div>
+        </div>
+
+        <aside class="system-map" aria-label="Almost Living Context system diagram">
+          <div class="map-row">
+            <div class="node">
+              <strong>Context service</strong>
+              <span>Hono API over SQLite or Postgres. Stores durable substrate items and frame history.</span>
+            </div>
+            <div class="arrow" aria-hidden="true"></div>
+            <div class="node">
+              <strong>MCP stdio server</strong>
+              <span>Thin tool wrapper over the service at <code>SERVICE_URL</code>.</span>
+            </div>
+          </div>
+          <div class="stack" aria-label="Context stack">
+            <div class="frame">Base rollup: compact durable context</div>
+            <div class="frame">Recent frames: top unarchived deltas</div>
+            <div class="frame">Substrate: decisions, items, gotchas, components, notes</div>
+          </div>
+        </aside>
+      </div>
+
+      <main>
+        <section id="quick-start">
+          <div class="section-head">
+            <h2>Quick Start</h2>
+            <p>Start with the offline demo, then run the service and MCP server in separate terminals.</p>
+          </div>
+
+          <div class="steps">
+            <article class="step">
+              <span class="step-num">1</span>
+              <strong>Install and verify</strong>
+              <p>The demo uses the deterministic stub adapter, so no model or API key is required.</p>
+              <div class="code-block">
+                <button class="copy" type="button">Copy</button>
+                <pre><code>git clone https://github.com/Sentry-Partners/ALC.git
+cd ALC
+npm install
+npm run demo</code></pre>
+              </div>
+            </article>
+
+            <article class="step">
+              <span class="step-num">2</span>
+              <strong>Run the service</strong>
+              <p>The API defaults to SQLite at <code>.alc.sqlite</code> and listens on port <code>8787</code>.</p>
+              <div class="code-block">
+                <button class="copy" type="button">Copy</button>
+                <pre><code>cp .env.example .env
+npm run migrate
+npm run dev</code></pre>
+              </div>
+            </article>
+
+            <article class="step">
+              <span class="step-num">3</span>
+              <strong>Run the MCP server</strong>
+              <p>Keep the API running. The MCP process communicates over stdio and calls the service URL.</p>
+              <div class="code-block">
+                <button class="copy" type="button">Copy</button>
+                <pre><code>SERVICE_URL=http://localhost:8787 npm run mcp</code></pre>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section id="client-config">
+          <div class="section-head">
+            <h2>Client Config</h2>
+            <p>Point any MCP-compatible client at the repo checkout and run the npm MCP script.</p>
+          </div>
+
+          <div class="wide-code">
+            <div class="code-block">
+              <button class="copy" type="button">Copy</button>
+              <pre><code>{
+  "mcpServers": {
+    "almost-living-context": {
+      "command": "npm",
+      "args": ["run", "mcp"],
+      "cwd": "/absolute/path/to/ALC",
+      "env": {
+        "SERVICE_URL": "http://localhost:8787"
+      }
+    }
+  }
+}</code></pre>
+            </div>
+            <div class="note">
+              Replace <code>/absolute/path/to/ALC</code> with your local checkout. The MCP server expects the
+              context service to be running before the client calls tools.
+            </div>
+          </div>
+        </section>
+
+        <section id="tools">
+          <div class="section-head">
+            <h2>MCP Tools</h2>
+            <p>These are thin wrappers over the local service API.</p>
+          </div>
+
+          <div class="tools">
+            <article class="tool">
+              <strong><code>ctx_pull(k)</code></strong>
+              <p>Read the base rollup plus the top <code>k</code> unarchived frames.</p>
+            </article>
+            <article class="tool">
+              <strong><code>ctx_push_frame(title, body)</code></strong>
+              <p>Append a new delta frame to the time-linear stack.</p>
+            </article>
+            <article class="tool">
+              <strong><code>ctx_upsert_item(kind, key, title, body, status, refs, tags)</code></strong>
+              <p>Create or update durable substrate context by stable key.</p>
+            </article>
+            <article class="tool">
+              <strong><code>ctx_query_items(kind, status, q, key)</code></strong>
+              <p>Search the queried substrate instead of restating durable context in prose.</p>
+            </article>
+            <article class="tool">
+              <strong><code>ctx_compact(keep)</code></strong>
+              <p>Archive older frames and rewrite the base rollup with the selected LLM adapter.</p>
+            </article>
+            <article class="tool">
+              <strong><code>ctx_check_staleness(frame)</code></strong>
+              <p>Compare one frame against current substrate items and report drift.</p>
+            </article>
+          </div>
+        </section>
+
+        <section id="adapters">
+          <div class="section-head">
+            <h2>LLM Adapters</h2>
+            <p>Use <code>stub</code> for offline runs, or switch to a local or hosted provider through env vars.</p>
+          </div>
+
+          <div class="code-block">
+            <button class="copy" type="button">Copy</button>
+            <pre><code>LLM_PROVIDER=stub
+
+# or
+LLM_PROVIDER=ollama
+OLLAMA_URL=http://localhost:11434
+OLLAMA_MODEL=llama3.1
+
+# or
+LLM_PROVIDER=openai
+OPENAI_API_KEY=...
+
+# or
+LLM_PROVIDER=anthropic
+ANTHROPIC_API_KEY=...</code></pre>
+          </div>
+        </section>
+      </main>
+
+      <footer>
+        MIT licensed reference implementation. Source:
+        <a href="https://github.com/Sentry-Partners/ALC">github.com/Sentry-Partners/ALC</a>
+      </footer>
+    </div>
+
+    <script>
+      for (const button of document.querySelectorAll(".copy")) {
+        button.addEventListener("click", async () => {
+          const code = button.nextElementSibling?.innerText || "";
+          await navigator.clipboard.writeText(code.trim());
+          const previous = button.textContent;
+          button.textContent = "Copied";
+          setTimeout(() => {
+            button.textContent = previous;
+          }, 1200);
+        });
+      }
+    </script>
+  </body>
+</html>
