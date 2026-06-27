@@ -1,12 +1,10 @@
 import Database from "better-sqlite3";
 import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
-import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { resolve } from "node:path";
 import type { ContextDb, ContextItem, Frame, ItemInput, ItemQuery } from "./types.js";
 
-const here = dirname(fileURLToPath(import.meta.url));
-const migrationPath = resolve(here, "../../migrations/001_init_sqlite.sql");
+const migrationPath = resolve(process.cwd(), "migrations/001_init_sqlite.sql");
 
 type SqliteItemRow = Omit<ContextItem, "refs" | "tags"> & { refs: string; tags: string };
 

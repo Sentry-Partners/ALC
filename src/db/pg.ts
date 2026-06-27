@@ -1,13 +1,11 @@
 import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
-import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { resolve } from "node:path";
 import pg from "pg";
 import type { ContextDb, ContextItem, Frame, ItemInput, ItemQuery } from "./types.js";
 
 const { Pool } = pg;
-const here = dirname(fileURLToPath(import.meta.url));
-const migrationPath = resolve(here, "../../migrations/001_init_pg.sql");
+const migrationPath = resolve(process.cwd(), "migrations/001_init_pg.sql");
 
 export class PostgresContextDb implements ContextDb {
   private pool: pg.Pool;
