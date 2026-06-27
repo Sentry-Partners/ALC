@@ -1,0 +1,31 @@
+{
+  "name": "almost-living-context",
+  "version": "0.1.0",
+  "description": "Small reference implementation of a queried context substrate plus delta-frame stack.",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "dev": "tsx src/api/server.ts",
+    "build": "tsc",
+    "migrate": "tsx src/db/migrate.ts",
+    "demo": "tsx demo/demo.ts",
+    "mcp": "tsx src/mcp/server.ts"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.14.0",
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "better-sqlite3": "^11.10.0",
+    "hono": "^4.7.9",
+    "pg": "^8.15.6"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/node": "^22.15.21",
+    "@types/pg": "^8.11.14",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
