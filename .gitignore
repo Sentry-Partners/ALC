@@ -6,3 +6,6 @@ dist/
 *.sqlite-wal
 *.db
 .DS_Store
+
+# Local Netlify folder
+.netlify
